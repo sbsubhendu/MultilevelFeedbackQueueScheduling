@@ -21,21 +21,44 @@ struct process{
  void addToReady(struct process *);
  void addToWaiting(struct process *);
  void updateStatus(struct process *);
+void getUserInput(int n);
  void showStatus(int t);
  void updateWaitingTime();
+void addToNAF(struct process *);
+void addToProcesses(struct process *);
  struct process * ReadyFront=NULL,*ReadyRear=NULL,*WFront=NULL,*WRear=NULL,*NAF=NULL,*NAR=NULL;
  struct process * processesF=NULL, *processesR=NULL;
 
  
  int main(){
-     int n=3,t=0,qt=1;struct process * temp,*running;
-     initialize();
+     int n=3,t=0,qt=1,quant,ch;struct process * temp,*running;
+	printf("Choices Available\n");
+	printf("1. User Input.\n");
+	printf("2 Auto Generated\n");
+	printf("Enter Choices:");
+	scanf("%d",&ch);
+     if(ch==1){
+	printf("Enter no of process");
+	scanf("%d",&n);
+	//initialize();
+	
+	getUserInput(n);
+	printf("Enter quant time:");scanf("%d",&quant);
+	}
+	else if(ch==2){
+	n=3;
+	initialize();
+	quant=1;
+	}
+	else
+	initialize();
      
      printf("T");
      for(temp=processesF;temp!=NULL;temp=temp->next){
          printf("\t %c",temp->pid);
         }
      printf("\n");
+	qt=quant;
      
      for(t=0;n>=0&&t<8;t++)
      {
@@ -48,7 +71,7 @@ struct process{
              }
          if(ReadyRear!=NULL)
              ReadyRear->next=NULL;
-        if(qt==1)
+        if(qt==quant)
          {
              running=getRunning(t);
           }
@@ -69,7 +92,7 @@ struct process{
              running->status='F';
              updateStatus(running);
              n--;
-             qt=1;
+             qt=quant;
          }else{
              qt--;
              if(qt==0){
@@ -78,7 +101,7 @@ struct process{
                  updateStatus(running);
                 // printf("Added to waiting %c\n",running->pid);
                  addToWaiting(running);
-                 qt=1;
+                 qt=quant;
              }
          }
          }
@@ -262,4 +285,85 @@ struct process{
          }
  }
  }
+void getUserInput(int n)
+{
+int i=0,a,nt;struct process * temp;
+for(i=0;i<n;i++)
+{
+printf("For process %c\n",(i+65));
+printf("Enter Arrival time");scanf("%d",&a);
+printf("Enter CPU time:");scanf("%d",&nt);
+temp=(struct process *)malloc(sizeof(struct process));
+temp->pid=(char)i+65;
+temp->at=a;
+     temp->nut=nt;
+     temp->status='N';
+     temp->q=-1;
+     temp->next=NULL;
+	addToNAF(temp);
+	addToProcesses(temp);
+}
+//initialize();
+}
+
+
+void addToNAF(struct process * temp)
+{
+struct process *temp1;
+         //printf("%c added to ready\n",temp->pid);
+      temp1= (struct process *)malloc(sizeof( struct process));
+      temp1->pid=temp->pid;
+      temp1->at=temp->at;
+      temp1->nut=temp->nut;
+      temp1->status=temp->status;
+      temp1->q=temp->q;
+      temp1->wt=temp->wt;
+      temp1->st=temp->st;
+   if(NAF==NULL)
+     {        
+         NAF=temp1;
+         NAR=temp1;
+         NAR->next=NULL;         
+     }else{
+       NAR->next=temp1;
+       temp1->next=NULL;
+       NAR=temp1;
+     }
+}
+void addToProcesses(struct process * temp)
+{
+struct process *temp1;
+         //printf("%c added to ready\n",temp->pid);
+      temp1= (struct process *)malloc(sizeof( struct process));
+      temp1->pid=temp->pid;
+      temp1->at=temp->at;
+      temp1->nut=temp->nut;
+      temp1->status=temp->status;
+      temp1->q=temp->q;
+      temp1->wt=temp->wt;
+      temp1->st=temp->st;
+   if(processesF==NULL)
+     {        
+         processesF=temp1;
+         processesR=temp1;
+         processesR->next=NULL;         
+     }else{
+       processesR->next=temp1;
+       temp1->next=NULL;
+       processesR=temp1;
+     }
+}
  
+
+
+
+
+
+
+
+
+
+
+
+
+
