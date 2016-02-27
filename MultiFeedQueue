@@ -5,7 +5,7 @@
  */
 
 #include<stdio.h>
-//#include<conio.h>
+#include<stdlib.h>
 
 void initialize();
 struct process{
@@ -22,6 +22,7 @@ struct process{
  void addToWaiting(struct process *);
  void updateStatus(struct process *);
 void getUserInput(int n);
+void generateData(int n);
  void showStatus(int t);
  void updateWaitingTime();
 void addToNAF(struct process *);
@@ -31,14 +32,14 @@ void addToProcesses(struct process *);
 
  
  int main(){
-     int n=3,t=0,qt=1,quant,ch;struct process * temp,*running;
-	printf("Choices Available\n");
+     int n=3,t=0,qt=1,quant,ch;struct process * temp,*running;time_t tt;
+	printf("Choices Available:\n");
 	printf("1. User Input.\n");
-	printf("2 Auto Generated\n");
-	printf("Enter Choices:");
+	printf("2. Auto Generated.\n");
+	printf("Enter Choice:");
 	scanf("%d",&ch);
      if(ch==1){
-	printf("Enter no of process");
+	printf("Enter no of process:");
 	scanf("%d",&n);
 	//initialize();
 	
@@ -46,21 +47,22 @@ void addToProcesses(struct process *);
 	printf("Enter quant time:");scanf("%d",&quant);
 	}
 	else if(ch==2){
-	n=3;
-	initialize();
-	quant=1;
+	srand((unsigned) time(&tt));
+	n=1+rand()%4;
+	generateData(n);
+	quant=1+rand()%2;
 	}
 	else
 	initialize();
      
-     printf("T");
+     printf("\nT");
      for(temp=processesF;temp!=NULL;temp=temp->next){
          printf("\t %c",temp->pid);
         }
      printf("\n");
 	qt=quant;
      
-     for(t=0;n>=0&&t<8;t++)
+     for(t=0;n>=0;t++)
      {
          for(temp=NAF;temp!=NULL;temp=temp->next) {
             if(temp->status=='N'&&temp->at==t){
@@ -80,7 +82,7 @@ void addToProcesses(struct process *);
              showStatus(t);
              break;
          }
-         if(running!=NULL){
+	 if(running!=NULL){
          running->status='R';
          updateStatus(running);
          showStatus(t);
@@ -103,14 +105,15 @@ void addToProcesses(struct process *);
                  addToWaiting(running);
                  qt=quant;
              }
-         }
-         }
+         }}else{showStatus(t);}
+         
       
      }
      for(temp=processesF;temp!=NULL;temp=temp->next){
          printf("\n Process id: %c , Arrival time:%d ,Start Time:%d,Waiting Time:%d, Burst Time:%d, Completion time:%d",
                  temp->pid,temp->at,temp->st,temp->wt,temp->nut,(temp->nut+temp->wt));
      }
+	printf("\n");
              
      return 0;
  }
@@ -291,8 +294,27 @@ int i=0,a,nt;struct process * temp;
 for(i=0;i<n;i++)
 {
 printf("For process %c\n",(i+65));
-printf("Enter Arrival time");scanf("%d",&a);
-printf("Enter CPU time:");scanf("%d",&nt);
+printf("Enter arrival time:");scanf("%d",&a);
+printf("Enter cpu burst time:");scanf("%d",&nt);
+temp=(struct process *)malloc(sizeof(struct process));
+temp->pid=(char)i+65;
+temp->at=a;
+     temp->nut=nt;
+     temp->status='N';
+     temp->q=-1;
+     temp->next=NULL;
+	addToNAF(temp);
+	addToProcesses(temp);
+}
+//initialize();
+}
+void generateData(int n)
+{
+int i=0,a,nt;struct process * temp;
+for(i=0;i<n;i++)
+{
+a=0+rand()%4;
+nt=1+rand()%4;
 temp=(struct process *)malloc(sizeof(struct process));
 temp->pid=(char)i+65;
 temp->at=a;
