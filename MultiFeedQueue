@@ -29,10 +29,12 @@ void addToNAF(struct process *);
 void addToProcesses(struct process *);
  struct process * ReadyFront=NULL,*ReadyRear=NULL,*WFront=NULL,*WRear=NULL,*NAF=NULL,*NAR=NULL;
  struct process * processesF=NULL, *processesR=NULL;
+int quant,noOfP;
+FILE *fptr;
 
  
  int main(){
-     int n=3,t=0,qt=1,quant,ch;struct process * temp,*running;time_t tt;
+     int n=0,t=0,qt=0,ch;struct process * temp,*running;time_t tt;
 	printf("Choices Available:\n");
 	printf("1. User Input.\n");
 	printf("2. Auto Generated.\n");
@@ -40,27 +42,36 @@ void addToProcesses(struct process *);
 	scanf("%d",&ch);
      if(ch==1){
 	printf("Enter no of process:");
-	scanf("%d",&n);
+	scanf("%d",&noOfP);
 	//initialize();
 	
-	getUserInput(n);
+	getUserInput(noOfP);
 	printf("Enter quant time:");scanf("%d",&quant);
 	}
 	else if(ch==2){
 	srand((unsigned) time(&tt));
-	n=1+rand()%4;
-	generateData(n);
+	noOfP=1+rand()%4;
+	generateData(noOfP);
 	quant=1+rand()%2;
 	}
 	else
-	initialize();
+	{
+	printf("\n Wrong choice entered. Try Again");
+	exit(0);
+	}
+	fptr=fopen("data.txt","w");
+	printf("\n No of Processes %d, Quant time %d\n",noOfP,quant);
+	fprintf(fptr,"\n No of Processes %d, Quant time %d\n",noOfP,quant);
+	fprintf(fptr,"\nT");
      
      printf("\nT");
      for(temp=processesF;temp!=NULL;temp=temp->next){
          printf("\t %c",temp->pid);
+	fprintf(fptr,"\t %c",temp->pid);
         }
-     printf("\n");
+     printf("\n");fprintf(fptr,"\n");
 	qt=quant;
+	n=noOfP;
      
      for(t=0;n>=0;t++)
      {
@@ -110,10 +121,14 @@ void addToProcesses(struct process *);
       
      }
      for(temp=processesF;temp!=NULL;temp=temp->next){
-         printf("\n Process id: %c , Arrival time:%d ,Start Time:%d,Waiting Time:%d, Burst Time:%d, Completion time:%d",
-                 temp->pid,temp->at,temp->st,temp->wt,temp->nut,(temp->nut+temp->wt));
+         printf("\n Process id: %c , Arrival time:%d ,Start Time:%d,Waiting Time:%d, Burst Time:%d,Turnaround time:%d, Penalty ratio:%2f",
+temp->pid,temp->at,temp->st,temp->wt,temp->nut,(temp->nut+temp->wt),((float)temp->nut/(temp->nut+temp->wt)));
+	fprintf(fptr,"\n Process id: %c , Arrival time:%d ,Start Time:%d,Waiting Time:%d, Burst Time:%d,Turnaround time:%d, Penalty ratio:%2f",
+temp->pid,temp->at,temp->st,temp->wt,temp->nut,(temp->nut+temp->wt),((float)temp->nut/(temp->nut+temp->wt)));
      }
-	printf("\n");
+	printf("\n");fprintf(fptr,"\n");
+	fclose(fptr);
+	printf("\nSee the details of last run in data.txt file.\n");
              
      return 0;
  }
@@ -262,17 +277,17 @@ void addToProcesses(struct process *);
  void showStatus(int t)
  {
      
-     printf("%d",t);
+     printf("%d",t);fprintf(fptr,"%d",t);
      struct process * temp;
      for(temp=processesF;temp!=NULL;temp=temp->next){
          if(temp->status=='F')
-             printf("\tF");
+             {printf("\tF");fprintf(fptr,"\tF");}
          else if(temp->status=='N')
-             printf("\t-");
+             {printf("\t-");fprintf(fptr,"\t-");}
          else
-             printf("\t%c(q%d)",temp->status,temp->q);
+             {printf("\t%c(q%d)",temp->status,temp->q);fprintf(fptr,"\t%c(q%d)",temp->status,temp->q);}
         }
-     printf("\n");
+     printf("\n");fprintf(fptr,"\n");
  }
  
  void updateWaitingTime(){
